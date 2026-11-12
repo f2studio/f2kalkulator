@@ -10,10 +10,10 @@
   --transition-speed: 0.3s;
 }
 
-/* --- TEMA UNGU LIGHT --- */
+/* --- TEMA UNGU LIGHT (Latar Luar Ungu Tombol =, Kartu Ungu Light) --- */
 body.theme-purple-light {
-  --bg-body: #ece8f8;
-  --bg-card: #ece8f8;
+  --bg-body: #7a46e9; /* Warna ungu pekat seperti tombol = */
+  --bg-card: #ece8f8; /* Kartu kalkulator Ungu Light lembut */
   --bg-display: #e5e0f5;
   --text-main: #3d3356;
   --text-muted: #8376a0;
@@ -21,17 +21,19 @@ body.theme-purple-light {
   --text-equals: #ffffff;
   --bg-equals: #7a46e9;
   
-  /* Neumorphic Shadows */
+  /* Bayangan Kartu di atas Latar Ungu */
+  --shadow-card: 16px 20px 38px #5c2ec2, -14px -14px 30px #9765ff, 0 12px 28px rgba(92, 46, 194, 0.45);
+  
+  /* Neumorphic Shadows untuk Tombol & Display di dalam Kartu Ungu Light */
   --shadow-light: #ffffff;
   --shadow-dark: #c4bcdb;
-  --shadow-card: 18px 18px 36px #c4bcdb, -18px -18px 36px #ffffff;
   --shadow-btn: 6px 6px 12px #c4bcdb, -6px -6px 12px #ffffff;
   --shadow-btn-pressed: inset 4px 4px 8px #c4bcdb, inset -4px -4px 8px #ffffff;
   --shadow-inset-display: inset 6px 6px 12px #c4bcdb, inset -6px -6px 12px #ffffff;
   
   --shadow-equals: 5px 5px 12px #b9aee0, -4px -4px 10px #ffffff;
   --shadow-equals-pressed: inset 3px 3px 6px #5422a8, inset -3px -3px 6px #9d6eff;
-  --border-subtle: rgba(255, 255, 255, 0.4);
+  --border-subtle: rgba(255, 255, 255, 0.5);
 }
 
 /* --- TEMA COKLAT DARK (Latar Luar Cream, Kartu Coklat Dark) --- */
