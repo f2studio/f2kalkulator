@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove(THEME_BROWN);
       document.body.classList.add(THEME_PURPLE);
       themeLabel.textContent = 'Coklat Dark';
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#7a46e9');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#1e1333');
     }
     localStorage.setItem('f2calc_theme', theme);
   }

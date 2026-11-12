@@ -10,28 +10,30 @@
   --transition-speed: 0.3s;
 }
 
-/* --- TEMA UNGU (Background Kalkulator Senada Warna Tombol =) --- */
+/* --- TEMA UNGU (Kalkulator Ungu Soft, Latar Luar Ungu Gelap) --- */
 body.theme-purple-light {
-  --bg-body: #7a46e9; /* Warna ungu pekat seperti tombol = */
-  --bg-card: #7a46e9; /* Background kartu kalkulator ikut ungu pekat */
-  --bg-display: #6732cf; /* Layar cekung ungu lebih gelap & kontras */
-  --text-main: #ffffff;
-  --text-muted: #d8c7fd;
-  --text-operator: #ffd166; /* Aksen emas elegan untuk tombol operator */
-  --text-equals: #7a46e9;
-  --bg-equals: #ffffff; /* Tombol = menonjol putih bersih dengan simbol ungu */
+  --bg-body: #1e1333; /* Latar luar Ungu Gelap (Midnight Violet) */
+  --bg-card: #ece8f8; /* Kartu kalkulator Ungu Soft lembut */
+  --bg-display: #e3dcf4; /* Layar cekung ungu soft */
+  --text-main: #36294d; /* Teks angka ungu gelap elegan */
+  --text-muted: #7d6f96; /* Teks fungsi pelengkap */
+  --text-operator: #6e35d8; /* Aksen operator ungu tajam */
+  --text-equals: #ffffff; /* Simbol sama dengan putih */
+  --bg-equals: #7a46e9; /* Tombol sama dengan ungu pekat */
   
-  /* Neumorphic Shadows untuk Ungu #7a46e9 */
-  --shadow-light: #9e69ff;
-  --shadow-dark: #5623bf;
-  --shadow-card: 16px 20px 38px #5623bf, -14px -14px 30px #9e69ff, 0 12px 28px rgba(86, 35, 191, 0.45);
-  --shadow-btn: 6px 6px 14px #5623bf, -6px -6px 14px #9e69ff;
-  --shadow-btn-pressed: inset 4px 4px 8px #5623bf, inset -4px -4px 8px #9e69ff;
-  --shadow-inset-display: inset 6px 6px 14px #4a1da8, inset -6px -6px 14px #8347f5;
+  /* Bayangan Kartu di atas Latar Ungu Gelap */
+  --shadow-card: 18px 22px 45px #10091d, -12px -12px 32px #2d1d4d, 0 14px 30px rgba(0, 0, 0, 0.45);
   
-  --shadow-equals: 5px 5px 14px #5623bf, -4px -4px 12px #9e69ff;
-  --shadow-equals-pressed: inset 3px 3px 6px #cfbbf5, inset -3px -3px 6px #ffffff;
-  --border-subtle: rgba(255, 255, 255, 0.15);
+  /* Neumorphic Shadows untuk Tombol di dalam Kartu Ungu Soft */
+  --shadow-light: #ffffff;
+  --shadow-dark: #c2bad9;
+  --shadow-btn: 6px 6px 13px #c2bad9, -6px -6px 13px #ffffff;
+  --shadow-btn-pressed: inset 4px 4px 8px #c2bad9, inset -4px -4px 8px #ffffff;
+  --shadow-inset-display: inset 6px 6px 13px #c2bad9, inset -6px -6px 13px #ffffff;
+  
+  --shadow-equals: 5px 5px 13px #5522b2, -4px -4px 11px #9c68ff;
+  --shadow-equals-pressed: inset 3px 3px 6px #4d1da6, inset -3px -3px 6px #9d6eff;
+  --border-subtle: rgba(255, 255, 255, 0.12);
 }
 
 /* --- TEMA COKLAT DARK (Latar Luar Cream, Kartu Coklat Dark) --- */
@@ -289,7 +291,7 @@ body.theme-brown-dark .dark-icon {
    ========================================================================== */
 @media (max-width: 420px) {
   body {
-    padding: 0.75rem;
+    padding: 1.25rem 0.9rem;
   }
 
   .calculator-container {
