@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#ece8f8" id="metaThemeColor">
+  <title>Kalkulator Neumorphism</title>
+  <!-- Google Fonts: Poppins & JetBrains Mono untuk angka -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-purple-light">
+  <div class="calculator-container">
+    <!-- Header: Judul & Pengalih Tema -->
+    <header class="calculator-header">
+      <div class="title-badge">F2 Calc</div>
+      <button id="themeToggleBtn" class="neumorph-btn toggle-btn" title="Ganti Tema (Ungu Light / Coklat Dark)" aria-label="Ganti Tema">
+        <span class="theme-icon light-icon">🌙</span>
+        <span class="theme-icon dark-icon">☀️</span>
+        <span class="theme-label" id="themeLabel">Coklat Dark</span>
+      </button>
+    </header>
+
+    <!-- Layar / Display Dua Baris (Sunken Neumorphic) -->
+    <div class="display-container neumorph-inset">
+      <div class="expression-display" id="expressionDisplay" aria-live="polite"></div>
+      <div class="current-display" id="currentDisplay" aria-live="polite">0</div>
+    </div>
+
+    <!-- Tombol-tombol Kalkulator -->
+    <div class="keypad-grid">
+      <!-- Baris 1: Fungsi Pembersih & Modifikasi -->
+      <button class="neumorph-btn key-action" data-action="all-clear" title="All Clear">AC</button>
+      <button class="neumorph-btn key-action" data-action="delete" title="Backspace">⌫</button>
+      <button class="neumorph-btn key-action" data-action="percent" title="Persen">%</button>
+      <button class="neumorph-btn key-operator" data-operator="÷" title="Bagi">÷</button>
+
+      <!-- Baris 2 -->
+      <button class="neumorph-btn key-number" data-number="7">7</button>
+      <button class="neumorph-btn key-number" data-number="8">8</button>
+      <button class="neumorph-btn key-number" data-number="9">9</button>
+      <button class="neumorph-btn key-operator" data-operator="×" title="Kali">×</button>
+
+      <!-- Baris 3 -->
+      <button class="neumorph-btn key-number" data-number="4">4</button>
+      <button class="neumorph-btn key-number" data-number="5">5</button>
+      <button class="neumorph-btn key-number" data-number="6">6</button>
+      <button class="neumorph-btn key-operator" data-operator="-" title="Kurang">−</button>
+
+      <!-- Baris 4 -->
+      <button class="neumorph-btn key-number" data-number="1">1</button>
+      <button class="neumorph-btn key-number" data-number="2">2</button>
+      <button class="neumorph-btn key-number" data-number="3">3</button>
+      <button class="neumorph-btn key-operator" data-operator="+" title="Tambah">+</button>
+
+      <!-- Baris 5 -->
+      <button class="neumorph-btn key-action" data-action="negate" title="Positif / Negatif">±</button>
+      <button class="neumorph-btn key-number" data-number="0">0</button>
+      <button class="neumorph-btn key-action" data-action="decimal">.</button>
+      <button class="neumorph-btn key-equals" data-action="calculate" title="Sama dengan">=</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
