@@ -12,18 +12,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="style.css?v=2.3">
 </head>
 <body class="theme-purple-light">
   <div class="calculator-container">
-    <!-- Header: Judul & Pengalih Tema -->
+    <!-- Header: Judul & Aksi -->
     <header class="calculator-header">
       <div class="title-badge">F2 Calc</div>
-      <button id="themeToggleBtn" class="neumorph-btn toggle-btn" title="Ganti Tema (Ungu Light / Coklat Dark)" aria-label="Ganti Tema">
-        <span class="theme-icon light-icon">🌙</span>
-        <span class="theme-icon dark-icon">☀️</span>
-        <span class="theme-label" id="themeLabel">Coklat Dark</span>
-      </button>
+      <div class="header-actions">
+        <button id="historyToggleBtn" class="neumorph-btn icon-btn" title="Riwayat Perhitungan" aria-label="Riwayat Perhitungan">
+          🕒
+        </button>
+        <button id="themeToggleBtn" class="neumorph-btn toggle-btn" title="Ganti Tema (Ungu Light / Coklat Dark)" aria-label="Ganti Tema">
+          <span class="theme-icon light-icon">🌙</span>
+          <span class="theme-icon dark-icon">☀️</span>
+          <span class="theme-label" id="themeLabel">Coklat Dark</span>
+        </button>
+      </div>
     </header>
 
     <!-- Layar / Display Dua Baris (Sunken Neumorphic) -->
@@ -64,8 +69,22 @@
       <button class="neumorph-btn key-action" data-action="decimal">.</button>
       <button class="neumorph-btn key-equals" data-action="calculate" title="Sama dengan">=</button>
     </div>
+
+    <!-- Panel Riwayat Perhitungan (Slide-over Neumorphic) -->
+    <div class="history-panel" id="historyPanel" aria-hidden="true">
+      <div class="history-header">
+        <span class="history-title">⏱ Riwayat</span>
+        <div class="history-actions">
+          <button id="clearHistoryBtn" class="history-action-btn" title="Hapus Semua Riwayat">Hapus</button>
+          <button id="closeHistoryBtn" class="history-close-btn" title="Tutup">✕</button>
+        </div>
+      </div>
+      <div class="history-list" id="historyList">
+        <!-- Item riwayat dinamis -->
+      </div>
+    </div>
   </div>
 
-  <script src="script.js?v=2.2"></script>
+  <script src="script.js?v=2.3"></script>
 </body>
 </html>

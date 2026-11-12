@@ -179,11 +179,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const formattedResult = formatNumber(result);
 
     if (isFinal) {
-      setExpression(`${previousValue} ${currentOperator} ${currentValue} =`);
+      const exprText = `${previousValue} ${currentOperator} ${currentValue} =`;
+      setExpression(exprText);
       currentValue = formattedResult;
       previousValue = null;
       currentOperator = null;
       isResultState = true;
+      if (formattedResult !== 'Error') {
+        saveToHistory(exprText, formattedResult);
+      }
     } else {
       currentValue = formattedResult;
       previousValue = formattedResult;
@@ -223,9 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentValue === 'Error') return;
     const num = parseFloat(currentValue);
     const result = num / 100;
-    currentValue = formatNumber(result);
-    setExpression(`${num}%`);
+    const formattedResult = formatNumber(result);
+    const exprText = `${num}% =`;
+    currentValue = formattedResult;
+    setExpression(exprText);
     isResultState = true;
+    saveToHistory(exprText, formattedResult);
     updateDisplay();
   }
 
@@ -240,12 +247,108 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
+  // PENGELOLA RIWAYAT PERHITUNGAN
+  // =========================================================================
+  const historyToggleBtn = document.getElementById('historyToggleBtn');
+  const historyPanel = document.getElementById('historyPanel');
+  const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const historyList = document.getElementById('historyList');
+
+  let historyData = [];
+  try {
+    historyData = JSON.parse(localStorage.getItem('f2calc_history') || '[]');
+  } catch (e) {
+    historyData = [];
+  }
+
+  function saveToHistory(expression, result) {
+    historyData.unshift({
+      expr: expression,
+      result: result,
+      id: Date.now()
+    });
+    if (historyData.length > 40) {
+      historyData = historyData.slice(0, 40);
+    }
+    localStorage.setItem('f2calc_history', JSON.stringify(historyData));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (!historyList) return;
+    historyList.innerHTML = '';
+
+    if (historyData.length === 0) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'history-empty';
+      emptyDiv.innerHTML = `
+        <span class="history-empty-icon">📝</span>
+        <span>Belum ada riwayat perhitungan</span>
+      `;
+      historyList.appendChild(emptyDiv);
+      return;
+    }
+
+    historyData.forEach((item) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'history-item';
+      itemEl.title = 'Ketuk untuk menggunakan hasil ini';
+      itemEl.innerHTML = `
+        <div class="history-expr">${item.expr}</div>
+        <div class="history-res">${item.result}</div>
+      `;
+
+      itemEl.addEventListener('click', () => {
+        currentValue = item.result;
+        previousValue = null;
+        currentOperator = null;
+        isResultState = true;
+        setExpression(item.expr);
+        updateDisplay();
+        toggleHistory(false);
+      });
+
+      historyList.appendChild(itemEl);
+    });
+  }
+
+  function toggleHistory(show) {
+    if (!historyPanel) return;
+    if (show === undefined) {
+      historyPanel.classList.toggle('open');
+    } else if (show) {
+      historyPanel.classList.add('open');
+    } else {
+      historyPanel.classList.remove('open');
+    }
+    historyPanel.setAttribute('aria-hidden', !historyPanel.classList.contains('open'));
+  }
+
+  if (historyToggleBtn) {
+    historyToggleBtn.addEventListener('click', () => toggleHistory());
+  }
+  if (closeHistoryBtn) {
+    closeHistoryBtn.addEventListener('click', () => toggleHistory(false));
+  }
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+      historyData = [];
+      localStorage.removeItem('f2calc_history');
+      renderHistory();
+    });
+  }
+
+  // Render riwayat awal
+  renderHistory();
+
+  // =========================================================================
   // EVENT LISTENER KLIK PADA TOMBOL
   // =========================================================================
   buttons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      // Tombol toggle tema diabaikan dari kalkulasi
-      if (btn.id === 'themeToggleBtn') return;
+      // Tombol toggle tema & riwayat diabaikan dari kalkulasi
+      if (btn.id === 'themeToggleBtn' || btn.id === 'historyToggleBtn') return;
 
       const num = btn.dataset.number;
       const op = btn.dataset.operator;
@@ -330,8 +433,15 @@ document.addEventListener('DOMContentLoaded', () => {
       handleDelete();
       triggerButtonEffect('button[data-action="delete"]');
     }
-    // Escape atau huruf C / c untuk All Clear
-    else if (key === 'Escape' || key.toLowerCase() === 'c') {
+    // Escape atau huruf C / c untuk All Clear / Tutup Riwayat
+    else if (key === 'Escape') {
+      if (historyPanel && historyPanel.classList.contains('open')) {
+        toggleHistory(false);
+      } else {
+        handleAllClear();
+        triggerButtonEffect('button[data-action="all-clear"]');
+      }
+    } else if (key.toLowerCase() === 'c') {
       handleAllClear();
       triggerButtonEffect('button[data-action="all-clear"]');
     }

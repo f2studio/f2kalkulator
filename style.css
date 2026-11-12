@@ -100,6 +100,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
   transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
 }
 
@@ -117,6 +119,25 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 0.95rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-main);
 }
 
 .toggle-btn {
@@ -281,9 +302,164 @@ body.theme-brown-dark .dark-icon {
   transform: translateY(1px) scale(0.98);
 }
 
-/* Khusus tombol toggle tema di header */
+/* Khusus tombol toggle tema & icon di header */
 .calculator-header .neumorph-btn {
   aspect-ratio: unset;
+}
+
+.calculator-header .icon-btn {
+  aspect-ratio: 1;
+}
+
+/* ==========================================================================
+   Panel Riwayat Perhitungan (Slide-Over Neumorphic)
+   ========================================================================== */
+.history-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-card);
+  border-radius: 36px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  z-index: 20;
+  transform: translateY(102%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.history-panel.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.history-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.history-action-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem 0.65rem;
+  border-radius: 10px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.history-action-btn:hover {
+  color: var(--text-operator);
+}
+
+.history-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.15s ease;
+}
+
+.history-close-btn:hover {
+  color: var(--text-main);
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.2rem;
+  scrollbar-width: thin;
+}
+
+.history-item {
+  background-color: var(--bg-card);
+  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  box-shadow: var(--shadow-btn);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-1px);
+}
+
+.history-item:active {
+  box-shadow: var(--shadow-btn-pressed) !important;
+  transform: translateY(1px);
+}
+
+.history-expr {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.history-res {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.history-empty {
+  margin: auto;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 0;
+}
+
+.history-empty-icon {
+  font-size: 2.2rem;
+  opacity: 0.6;
 }
 
 /* ==========================================================================
