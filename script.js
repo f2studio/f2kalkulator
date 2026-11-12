@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.remove(THEME_PURPLE);
       document.body.classList.add(THEME_BROWN);
       themeLabel.textContent = 'Ungu Light';
-      if (metaThemeColor) metaThemeColor.setAttribute('content', '#231a15');
+      if (metaThemeColor) metaThemeColor.setAttribute('content', '#f3ede4');
     } else {
       document.body.classList.remove(THEME_BROWN);
       document.body.classList.add(THEME_PURPLE);

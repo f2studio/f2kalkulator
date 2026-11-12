@@ -34,28 +34,30 @@ body.theme-purple-light {
   --border-subtle: rgba(255, 255, 255, 0.4);
 }
 
-/* --- TEMA COKLAT DARK --- */
+/* --- TEMA COKLAT DARK (Latar Luar Cream, Kartu Coklat Dark) --- */
 body.theme-brown-dark {
-  --bg-body: #231a15;
-  --bg-card: #231a15;
+  --bg-body: #f3ede4; /* Latar luar Cream lembut elegan */
+  --bg-card: #241a15; /* Kartu kalkulator Coklat Gelap pekat */
   --bg-display: #1c1410;
   --text-main: #f5ece5;
-  --text-muted: #a89487;
+  --text-muted: #ad9a8c;
   --text-operator: #e59850;
   --text-equals: #1c1410;
   --bg-equals: #e59850;
   
-  /* Neumorphic Shadows */
-  --shadow-light: #2f231d;
-  --shadow-dark: #16100c;
-  --shadow-card: 18px 18px 36px #16100c, -18px -18px 36px #2f231d;
-  --shadow-btn: 6px 6px 14px #16100c, -6px -6px 14px #2f231d;
-  --shadow-btn-pressed: inset 4px 4px 8px #16100c, inset -4px -4px 8px #2f231d;
-  --shadow-inset-display: inset 6px 6px 14px #140e0b, inset -6px -6px 14px #30241e;
+  /* Bayangan Kartu di atas Latar Cream yang Elegan */
+  --shadow-card: 16px 20px 38px #d6c9b7, -14px -14px 30px #ffffff, 0 12px 28px rgba(36, 26, 21, 0.16);
   
-  --shadow-equals: 5px 5px 14px #16100c, -4px -4px 12px #2f231d;
+  /* Neumorphic Shadows untuk Tombol & Display di dalam Kartu Coklat */
+  --shadow-light: #30231d;
+  --shadow-dark: #160f0c;
+  --shadow-btn: 6px 6px 14px #160f0c, -6px -6px 14px #30231d;
+  --shadow-btn-pressed: inset 4px 4px 8px #160f0c, inset -4px -4px 8px #30231d;
+  --shadow-inset-display: inset 6px 6px 14px #120c09, inset -6px -6px 14px #32241d;
+  
+  --shadow-equals: 5px 5px 14px #160f0c, -4px -4px 12px #30231d;
   --shadow-equals-pressed: inset 3px 3px 6px #945722, inset -3px -3px 6px #ffbe7d;
-  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-subtle: rgba(255, 255, 255, 0.08);
 }
 
 /* ==========================================================================
