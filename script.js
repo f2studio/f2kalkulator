@@ -262,17 +262,23 @@ document.addEventListener('DOMContentLoaded', () => {
     historyData = [];
   }
 
-  function saveToHistory(expression, result) {
-    historyData.unshift({
+  function saveToHistory(expression, result, broadcast = true) {
+    const newItem = {
       expr: expression,
       result: result,
       id: Date.now()
-    });
+    };
+    historyData.unshift(newItem);
     if (historyData.length > 40) {
       historyData = historyData.slice(0, 40);
     }
     localStorage.setItem('f2calc_history', JSON.stringify(historyData));
     renderHistory();
+
+    // Broadcast ke perangkat lain yang satu PIN
+    if (broadcast && typeof broadcastCalculation === 'function') {
+      broadcastCalculation(newItem);
+    }
   }
 
   function renderHistory() {
@@ -336,6 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
       historyData = [];
       localStorage.removeItem('f2calc_history');
       renderHistory();
+      if (typeof broadcastClearHistory === 'function') {
+        broadcastClearHistory();
+      }
     });
   }
 
@@ -343,12 +352,272 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistory();
 
   // =========================================================================
+  // SINKRONISASI REAL-TIME PC & HP (PIN 4-DIGIT VIA MQTT)
+  // =========================================================================
+  const syncToggleBtn = document.getElementById('syncToggleBtn');
+  const syncLabel = document.getElementById('syncLabel');
+  const syncModal = document.getElementById('syncModal');
+  const closeSyncModalBtn = document.getElementById('closeSyncModalBtn');
+  const syncPinInput = document.getElementById('syncPinInput');
+  const syncStatusMsg = document.getElementById('syncStatusMsg');
+  const connectSyncBtn = document.getElementById('connectSyncBtn');
+  const disconnectSyncBtn = document.getElementById('disconnectSyncBtn');
+
+  const myClientId = 'f2_' + Math.random().toString(36).substring(2, 9);
+  let mqttClient = null;
+  let currentSyncPin = localStorage.getItem('f2calc_sync_pin') || null;
+
+  function updateSyncUI(status, pin = null) {
+    if (!syncToggleBtn) return;
+
+    if (status === 'connected') {
+      syncToggleBtn.classList.remove('connecting');
+      syncToggleBtn.classList.add('connected');
+      syncLabel.textContent = pin || currentSyncPin;
+      if (disconnectSyncBtn) disconnectSyncBtn.style.display = 'block';
+      if (connectSyncBtn) connectSyncBtn.textContent = 'Ganti PIN';
+      if (syncStatusMsg) {
+        syncStatusMsg.className = 'sync-status-msg success';
+        syncStatusMsg.textContent = `🟢 Terhubung dengan PIN: ${pin || currentSyncPin}`;
+      }
+    } else if (status === 'connecting') {
+      syncToggleBtn.classList.add('connecting');
+      syncToggleBtn.classList.remove('connected');
+      syncLabel.textContent = '...';
+      if (syncStatusMsg) {
+        syncStatusMsg.className = 'sync-status-msg info';
+        syncStatusMsg.textContent = '🟡 Sedang menghubungkan...';
+      }
+    } else {
+      syncToggleBtn.classList.remove('connecting', 'connected');
+      syncLabel.textContent = 'Sinkron';
+      if (disconnectSyncBtn) disconnectSyncBtn.style.display = 'none';
+      if (connectSyncBtn) connectSyncBtn.textContent = 'Hubungkan';
+      if (syncStatusMsg) {
+        syncStatusMsg.className = 'sync-status-msg info';
+        syncStatusMsg.textContent = 'Masukkan 4 digit PIN yang sama di PC & HP.';
+      }
+    }
+  }
+
+  function initSync(pin) {
+    if (typeof mqtt === 'undefined') {
+      if (syncStatusMsg) {
+        syncStatusMsg.className = 'sync-status-msg error';
+        syncStatusMsg.textContent = 'Modul sinkronisasi belum siap. Coba muat ulang.';
+      }
+      return;
+    }
+
+    if (mqttClient) {
+      try {
+        mqttClient.end(true);
+      } catch (e) {}
+    }
+
+    currentSyncPin = pin;
+    localStorage.setItem('f2calc_sync_pin', pin);
+    updateSyncUI('connecting');
+
+    const topic = `f2kalkulator/sync/room_${pin}`;
+    const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
+
+    try {
+      mqttClient = mqtt.connect(brokerUrl, {
+        clientId: myClientId,
+        clean: true,
+        connectTimeout: 7000,
+        keepalive: 45
+      });
+
+      mqttClient.on('connect', () => {
+        updateSyncUI('connected', pin);
+        mqttClient.subscribe(topic, { qos: 0 });
+
+        // Kirim salam & minta riwayat dari perangkat lain
+        mqttClient.publish(topic, JSON.stringify({
+          type: 'HELLO',
+          senderId: myClientId,
+          historyCount: historyData.length
+        }));
+      });
+
+      mqttClient.on('message', (receivedTopic, payload) => {
+        try {
+          const data = JSON.parse(payload.toString());
+          if (data.senderId === myClientId) return; // Abaikan pesan dari diri sendiri
+
+          if (data.type === 'HELLO') {
+            // Perangkat lain baru terhubung: jika kita punya riwayat, bagikan padanya
+            if (historyData.length > 0) {
+              mqttClient.publish(topic, JSON.stringify({
+                type: 'SYNC_HISTORY_FULL',
+                senderId: myClientId,
+                history: historyData
+              }));
+            }
+          } else if (data.type === 'SYNC_HISTORY_FULL' && Array.isArray(data.history)) {
+            // Gabungkan riwayat dari perangkat pasangan (hindari duplikasi)
+            const existingKeys = new Set(historyData.map((h) => `${h.expr}|${h.result}`));
+            let hasNew = false;
+            data.history.forEach((incoming) => {
+              const key = `${incoming.expr}|${incoming.result}`;
+              if (!existingKeys.has(key)) {
+                historyData.push(incoming);
+                existingKeys.add(key);
+                hasNew = true;
+              }
+            });
+
+            if (hasNew) {
+              // Urutkan berdasarkan waktu/id terbaru
+              historyData.sort((a, b) => (b.id || 0) - (a.id || 0));
+              if (historyData.length > 40) historyData = historyData.slice(0, 40);
+              localStorage.setItem('f2calc_history', JSON.stringify(historyData));
+              renderHistory();
+              notifyHistoryUpdate();
+            }
+          } else if (data.type === 'NEW_CALCULATION' && data.item) {
+            // Perhitungan baru masuk dari perangkat lain
+            historyData.unshift(data.item);
+            if (historyData.length > 40) historyData = historyData.slice(0, 40);
+            localStorage.setItem('f2calc_history', JSON.stringify(historyData));
+            renderHistory();
+            notifyHistoryUpdate();
+          } else if (data.type === 'CLEAR_HISTORY') {
+            // Perangkat lain menghapus riwayat
+            historyData = [];
+            localStorage.removeItem('f2calc_history');
+            renderHistory();
+          }
+        } catch (err) {
+          console.warn('Gagal memproses data sinkron:', err);
+        }
+      });
+
+      mqttClient.on('error', (err) => {
+        console.warn('MQTT error:', err);
+        updateSyncUI('connecting');
+      });
+
+      mqttClient.on('offline', () => {
+        updateSyncUI('connecting');
+      });
+    } catch (err) {
+      console.error('Koneksi MQTT gagal:', err);
+      updateSyncUI('disconnected');
+    }
+  }
+
+  function broadcastCalculation(item) {
+    if (mqttClient && mqttClient.connected && currentSyncPin) {
+      const topic = `f2kalkulator/sync/room_${currentSyncPin}`;
+      mqttClient.publish(topic, JSON.stringify({
+        type: 'NEW_CALCULATION',
+        senderId: myClientId,
+        item: item
+      }));
+    }
+  }
+
+  function broadcastClearHistory() {
+    if (mqttClient && mqttClient.connected && currentSyncPin) {
+      const topic = `f2kalkulator/sync/room_${currentSyncPin}`;
+      mqttClient.publish(topic, JSON.stringify({
+        type: 'CLEAR_HISTORY',
+        senderId: myClientId
+      }));
+    }
+  }
+
+  function disconnectSync() {
+    if (mqttClient) {
+      try {
+        mqttClient.end(true);
+      } catch (e) {}
+      mqttClient = null;
+    }
+    currentSyncPin = null;
+    localStorage.removeItem('f2calc_sync_pin');
+    updateSyncUI('disconnected');
+    if (syncPinInput) syncPinInput.value = '';
+  }
+
+  function notifyHistoryUpdate() {
+    if (historyToggleBtn) {
+      historyToggleBtn.classList.add('pressed');
+      setTimeout(() => historyToggleBtn.classList.remove('pressed'), 300);
+    }
+  }
+
+  function toggleSyncModal(show) {
+    if (!syncModal) return;
+    if (show === undefined) {
+      syncModal.classList.toggle('open');
+    } else if (show) {
+      syncModal.classList.add('open');
+    } else {
+      syncModal.classList.remove('open');
+    }
+    syncModal.setAttribute('aria-hidden', !syncModal.classList.contains('open'));
+
+    if (syncModal.classList.contains('open')) {
+      if (currentSyncPin && syncPinInput) {
+        syncPinInput.value = currentSyncPin;
+      }
+      if (syncPinInput) syncPinInput.focus();
+    }
+  }
+
+  if (syncToggleBtn) {
+    syncToggleBtn.addEventListener('click', () => toggleSyncModal(true));
+  }
+  if (closeSyncModalBtn) {
+    closeSyncModalBtn.addEventListener('click', () => toggleSyncModal(false));
+  }
+  if (connectSyncBtn) {
+    connectSyncBtn.addEventListener('click', () => {
+      const pin = syncPinInput ? syncPinInput.value.trim() : '';
+      if (!/^\d{4}$/.test(pin)) {
+        if (syncStatusMsg) {
+          syncStatusMsg.className = 'sync-status-msg error';
+          syncStatusMsg.textContent = 'PIN harus berupa 4 digit angka (contoh: 1234)!';
+        }
+        if (syncPinInput) syncPinInput.focus();
+        return;
+      }
+
+      initSync(pin);
+      setTimeout(() => toggleSyncModal(false), 900);
+    });
+  }
+  if (disconnectSyncBtn) {
+    disconnectSyncBtn.addEventListener('click', () => {
+      disconnectSync();
+      setTimeout(() => toggleSyncModal(false), 600);
+    });
+  }
+
+  // Hubungkan otomatis saat pertama kali buka jika PIN tersimpan
+  if (currentSyncPin && /^\d{4}$/.test(currentSyncPin)) {
+    initSync(currentSyncPin);
+  } else {
+    updateSyncUI('disconnected');
+  }
+
+  // =========================================================================
   // EVENT LISTENER KLIK PADA TOMBOL
   // =========================================================================
   buttons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      // Tombol toggle tema & riwayat diabaikan dari kalkulasi
-      if (btn.id === 'themeToggleBtn' || btn.id === 'historyToggleBtn') return;
+      // Tombol aksi header & modal diabaikan dari kalkulasi angka
+      if (
+        btn.id === 'themeToggleBtn' ||
+        btn.id === 'historyToggleBtn' ||
+        btn.id === 'syncToggleBtn' ||
+        btn.classList.contains('sync-submit-btn') ||
+        btn.classList.contains('sync-disconnect-btn')
+      ) return;
 
       const num = btn.dataset.number;
       const op = btn.dataset.operator;
@@ -395,6 +664,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('keydown', (e) => {
+    // Jika modal sinkronisasi sedang terbuka, prioritaskan input PIN
+    if (syncModal && syncModal.classList.contains('open')) {
+      if (e.key === 'Escape') {
+        toggleSyncModal(false);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (connectSyncBtn) connectSyncBtn.click();
+      }
+      return;
+    }
+
     const key = e.key;
 
     // Angka 0 - 9

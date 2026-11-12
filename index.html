@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.4">
 </head>
 <body class="theme-purple-light">
   <div class="calculator-container">
@@ -20,9 +20,16 @@
     <header class="calculator-header">
       <div class="title-badge">F2 Calc</div>
       <div class="header-actions">
+        <!-- Tombol Sinkronisasi PIN -->
+        <button id="syncToggleBtn" class="neumorph-btn sync-btn" title="Sinkronkan PC & HP" aria-label="Sinkronkan PC & HP">
+          <span class="sync-dot" id="syncDot"></span>
+          <span class="sync-label" id="syncLabel">Sinkron</span>
+        </button>
+        <!-- Tombol Riwayat -->
         <button id="historyToggleBtn" class="neumorph-btn icon-btn" title="Riwayat Perhitungan" aria-label="Riwayat Perhitungan">
           🕒
         </button>
+        <!-- Tombol Ganti Tema -->
         <button id="themeToggleBtn" class="neumorph-btn toggle-btn" title="Ganti Tema (Ungu Light / Coklat Dark)" aria-label="Ganti Tema">
           <span class="theme-icon light-icon">🌙</span>
           <span class="theme-icon dark-icon">☀️</span>
@@ -83,8 +90,31 @@
         <!-- Item riwayat dinamis -->
       </div>
     </div>
+
+    <!-- Modal Sinkronisasi PIN Real-time (Neumorphic) -->
+    <div class="sync-modal" id="syncModal" aria-hidden="true">
+      <div class="sync-modal-card neumorph-btn">
+        <div class="sync-modal-header">
+          <span class="sync-modal-title">📲 Sinkron PC & HP</span>
+          <button id="closeSyncModalBtn" class="history-close-btn" title="Tutup">✕</button>
+        </div>
+        <p class="sync-modal-desc">
+          Masukkan 4 digit PIN yang sama di PC dan HP agar riwayat perhitungan tersinkron otomatis secara real-time.
+        </p>
+        <div class="sync-input-container">
+          <input type="text" id="syncPinInput" class="sync-pin-input" maxlength="4" placeholder="1234" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+        </div>
+        <div class="sync-status-msg" id="syncStatusMsg"></div>
+        <div class="sync-modal-buttons">
+          <button id="connectSyncBtn" class="neumorph-btn sync-submit-btn">Hubungkan</button>
+          <button id="disconnectSyncBtn" class="neumorph-btn sync-disconnect-btn" style="display: none;">Putus</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="script.js?v=2.3"></script>
+  <!-- MQTT over WebSocket Library -->
+  <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+  <script src="script.js?v=2.4"></script>
 </body>
 </html>
